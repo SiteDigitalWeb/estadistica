@@ -1,0 +1,14 @@
+{
+    "name": "sitedigitalweb/estadistica",
+    "description": "Site Digital S.A.S Estadísticas Módulo para la identificar el comportamiento de estrategias implementadas en sitios web",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "SiteDigital",
+            "email": "desarrollo@sitedigital.com.co"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
