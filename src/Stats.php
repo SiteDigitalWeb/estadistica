@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalsiteSaaS\Estadistica;
+namespace Sitedigitalweb\Estadistica;
 
 use Illuminate\Database\Eloquent\Model;
 

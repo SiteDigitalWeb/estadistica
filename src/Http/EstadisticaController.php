@@ -1,13 +1,13 @@
 <?php
 
 
-namespace DigitalsiteSaaS\Estadistica\Http;
-use DigitalsiteSaaS\Pagina\Date;
+namespace Sitedigitalweb\Estadistica\Http;
+use Sitedigitalweb\Pagina\Date;
 use App\Http\Controllers\Controller;
-use DigitalsiteSaaS\Estadistica\Stats;
-use DigitalsiteSaaS\Pagina\Content;
-use DigitalsiteSaaS\Estadistica\Cms_Ips;
-use DigitalsiteSaaS\Estadistica\Page;
+use Sitedigitalweb\Estadistica\Stats;
+use Sitedigitalweb\Pagina\Content;
+use Sitedigitalweb\Estadistica\Cms_Ips;
+use Sitedigitalweb\Estadistica\Page;
 use DB;
 use Input;
 use Illuminate\Http\Request;
@@ -47,8 +47,8 @@ public function index(Request $request)
     $website = app(\Hyn\Tenancy\Environment::class)->website();
     
     // Seleccionar los modelos adecuados
-    $statsModel = $website ? \DigitalsiteSaaS\Estadistica\Tenant\Stats::class : Stats::class;
-    $pageModel = $website ? \DigitalsiteSaaS\Estadistica\Tenant\Page::class : Page::class;
+    $statsModel = $website ? \Sitedigitalweb\Estadistica\Tenant\Stats::class : Stats::class;
+    $pageModel = $website ? \Sitedigitalweb\Estadistica\Tenant\Page::class : Page::class;
 
     // Consultas comunes con filtro de fechas
     $baseStatsQuery = $statsModel::whereBetween('fecha', [$min_date, $max_date]);
@@ -97,7 +97,7 @@ protected function getGroupedStats($query, $field, $orderBy = 'sum', $orderDir =
 public function blocks()
 {
     $model = $this->tenantName 
-        ? \DigitalsiteSaaS\Estadistica\Tenant\Cms_Ips::class 
+        ? \Sitedigitalweb\Estadistica\Tenant\Cms_Ips::class 
         : Cms_Ips::class;
         
     return view('estadistica::block', [
@@ -109,7 +109,7 @@ public function crearblocks()
 {
     // Determinar el modelo según el contexto (tenant o no)
     $pagina = $this->tenantName 
-        ? new \DigitalsiteSaaS\Estadistica\Tenant\Cms_Ips 
+        ? new \Sitedigitalweb\Estadistica\Tenant\Cms_Ips 
         : new Cms_Ips;
 
     // Guardar la IP recibida desde el formulario
@@ -124,7 +124,7 @@ public function eliminar($id)
 {
     // Determinar el modelo según el contexto (tenant o no)
     $pagina = $this->tenantName 
-        ? \DigitalsiteSaaS\Estadistica\Tenant\CmsIps::findOrFail($id) 
+        ? \Sitedigitalweb\Estadistica\Tenant\CmsIps::findOrFail($id) 
         : Cms_Ips::findOrFail($id);
 
     // Eliminar el registro

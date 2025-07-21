@@ -1,6 +1,6 @@
 <?php
 
-namespace DigitalsiteSaaS\Estadistica\Tenant;
+namespace Sitedigitalweb\Estadistica\Tenant;
 
 use Hyn\Tenancy\Traits\UsesTenantConnection;
 use Illuminate\Database\Eloquent\Model;
