@@ -2,11 +2,13 @@
 
 @section('cabecera')
 @parent
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartkick@5.0.1/dist/chartkick.min.js"></script>
-<script src="https://www.google.com/jsapi"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.js"></script>
 <script src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.js"></script>
+
 
 <script>
     var CustomAdapter = new function() {
@@ -345,7 +347,6 @@
     </div>
 </div>
 
-{{ Html::script('modulo-estadisticas/js/jquery.min.js') }}
 
 {{ Html::script('modulo-estadisticas/js/moment.min.js') }}
 {{ Html::script('modulo-estadisticas/js/bootstrap-datetimepicker.min.js') }}
