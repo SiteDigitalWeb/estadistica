@@ -10,7 +10,7 @@ class Page extends Model
 {
 	use UsesTenantConnection;
 
-	protected $table = 'pages';
+	protected $table = 'cms_pages';
     public $timestamps = true;
 
 }
