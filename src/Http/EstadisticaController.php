@@ -35,51 +35,52 @@ protected $tenantName = null;
 
 public function index(Request $request)
 {
-    // Obtener fechas por defecto (últimos 3 días)
+    // 🔹 Fechas por defecto (últimos 3 días)
     $defaultMinDate = now()->subDays(3)->format('Y-m-d');
     $defaultMaxDate = now()->format('Y-m-d');
     
-    // Obtener parámetros de filtro con valores por defecto
+    // 🔹 Obtener parámetros de filtro con valores por defecto
     $min_date = $request->input('min_price', $defaultMinDate);
     $max_date = $request->input('max_price', $defaultMaxDate);
 
-    // Determinar el contexto (tenant o central)
+    // 🔹 Determinar el contexto (tenant o central)
     $website = app(\Hyn\Tenancy\Environment::class)->website();
     
     if ($website) {
-    // Si está en un tenant
-    $statsModel = \Sitedigitalweb\Estadistica\Tenant\Stats::class;
-    $pageModel  = \Sitedigitalweb\Estadistica\Tenant\Page::class;
-   } else {
-    // Si está en el contexto central (no tenant)
-    $statsModel = \Sitedigitalweb\Estadistica\Stats::class;
-    $pageModel  = \Sitedigitalweb\Estadistica\Page::class;
-}
+        // Si está en tenant
+        $statsModel = \Sitedigitalweb\Estadistica\Tenant\Stats::class;
+        $pageModel  = \Sitedigitalweb\Estadistica\Tenant\Page::class;
+    } else {
+        // Si está en el contexto central (no tenant)
+        $statsModel = \Sitedigitalweb\Estadistica\Stats::class;
+        $pageModel  = \Sitedigitalweb\Estadistica\Page::class;
+    }
 
-    // Consultas comunes con filtro de fechas
+    // 🔹 Consulta base con filtro de fechas
     $baseStatsQuery = $statsModel::whereBetween('fecha', [$min_date, $max_date]);
     
-    // Obtener estadísticas
+    // 🔹 Obtener estadísticas generales
     $stats = [
-        'visitas' => $baseStatsQuery->count(),
-        'nuevousuario' => $baseStatsQuery->distinct('ip')->count('ip'),
-        'conteopagina' => $pageModel::count(),
-        'paginas' => $this->getGroupedStats($baseStatsQuery, 'pagina'),
-        'referidos' => $this->getGroupedStats($baseStatsQuery, 'referido'),
-        'ciudades' => $this->getGroupedStats($baseStatsQuery, 'ciudad'),
-        'fuentes' => $this->getGroupedStats($baseStatsQuery->whereNotNull('utm_source'), 'utm_source'),
-        'idiomas' => $this->getGroupedStats($baseStatsQuery, 'idioma'),
-        'meses' => $this->getGroupedStats($baseStatsQuery, 'mes', 'cp', 'asc'),
-        'paises' => $this->getGroupedStats($baseStatsQuery, 'pais'),
-        'min_price' => $min_date, // Pasar las fechas a la vista
-        'max_price' => $max_date
+        'visitas'       => $baseStatsQuery->count(),
+        'nuevousuario'  => $baseStatsQuery->distinct('ip')->count('ip'),
+        'conteopagina'  => $pageModel::count(),
+        'paginas'       => $this->getGroupedStats($baseStatsQuery, 'pagina'),
+        'referidos'     => $this->getGroupedStats($baseStatsQuery, 'referido'),
+        'ciudades'      => $this->getGroupedStats($baseStatsQuery, 'ciudad'),
+        'fuentes'       => $this->getGroupedStats($baseStatsQuery->whereNotNull('utm_source'), 'utm_source'),
+        'idiomas'       => $this->getGroupedStats($baseStatsQuery, 'idioma'),
+        // ✅ Ajuste aquí — se quita cp del orden para evitar ONLY_FULL_GROUP_BY
+        'meses'         => $this->getGroupedStats($baseStatsQuery, 'mes'),
+        'paises'        => $this->getGroupedStats($baseStatsQuery, 'pais'),
+        'min_price'     => $min_date,
+        'max_price'     => $max_date,
     ];
 
-    // Solo para tenant
+    // 🔹 Solo para tenant: agrupar IPs
     if ($website) {
         $stats['ips'] = $baseStatsQuery
             ->select('ip', 'utm_source')
-            ->selectRaw('count(ip) as sum')
+            ->selectRaw('COUNT(ip) as sum')
             ->groupBy('ip', 'utm_source')
             ->orderBy('sum', 'desc')
             ->get();
@@ -89,12 +90,15 @@ public function index(Request $request)
 }
 
 
+
 // Método auxiliar para agrupar estadísticas
 protected function getGroupedStats($query, $field, $orderBy = 'sum', $orderDir = 'desc')
 {
-    return $query->clone()
+    $queryClone = clone $query;
+
+    return $queryClone
         ->select($field)
-        ->selectRaw('count(ip) as sum')
+        ->selectRaw('COUNT(ip) as sum')
         ->groupBy($field)
         ->orderBy($orderBy, $orderDir)
         ->get();
