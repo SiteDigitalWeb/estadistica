@@ -46,9 +46,15 @@ public function index(Request $request)
     // Determinar el contexto (tenant o central)
     $website = app(\Hyn\Tenancy\Environment::class)->website();
     
-    // Seleccionar los modelos adecuados
-    $statsModel = $website ? \Sitedigitalweb\Estadistica\Tenant\Stats::class : Stats::class;
-    $pageModel = $website ? \Sitedigitalweb\Estadistica\Tenant\Page::class : Page::class;
+    if ($website) {
+    // Si está en un tenant
+    $statsModel = \Sitedigitalweb\Estadistica\Tenant\Stats::class;
+    $pageModel  = \Sitedigitalweb\Estadistica\Tenant\Page::class;
+   } else {
+    // Si está en el contexto central (no tenant)
+    $statsModel = \Sitedigitalweb\Estadistica\Stats::class;
+    $pageModel  = \Sitedigitalweb\Estadistica\Page::class;
+}
 
     // Consultas comunes con filtro de fechas
     $baseStatsQuery = $statsModel::whereBetween('fecha', [$min_date, $max_date]);
@@ -81,6 +87,7 @@ public function index(Request $request)
 
     return view('estadistica::estadisticaweb', $stats);
 }
+
 
 // Método auxiliar para agrupar estadísticas
 protected function getGroupedStats($query, $field, $orderBy = 'sum', $orderDir = 'desc')
