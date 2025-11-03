@@ -61,34 +61,27 @@
             </div>
             <div class="table-responsive">
                 <form action="{{ URL::current() }}">
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6"> 
-                        <div class="form-group">
-                            <div class='input-group date' id='datetimepicker7'>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6"> 
+                            <div class="form-group">
                                 {{ Form::text('min_price', $min_price ?? now()->subDays(3)->format('Y-m-d'), [
-                                'class' => 'form-control',
-                                'readonly' => 'readonly',
-                                'placeholder' => 'Ingrese fecha desde'
+                                'class' => 'form-control flatpickr full-width-input',
+                                'placeholder' => 'Ingrese fecha desde',
+                                'readonly' => 'readonly'
                                 ]) }}
-                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6"> 
-                        <div class="form-group">
-                            <div class='input-group date' id='datetimepicker9'>
+                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6"> 
+                            <div class="form-group">
                                 {{ Form::text('max_price', $max_price ?? now()->format('Y-m-d'), [
-                                'class' => 'form-control',
-                                'readonly' => 'readonly', 
-                                'placeholder' => 'Ingrese fecha hasta'
+                                'class' => 'form-control flatpickr full-width-input',
+                                'placeholder' => 'Ingrese fecha hasta', 
+                                'readonly' => 'readonly'
                                 ]) }}
-                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> 
-                        <div class="form-group">
-                            <br>
-                            <div class='input-group pull-right' style="margin-top:-15px;margin-bottom:15px">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> 
+                            <div class="form-group text-right">
                                 <button class="btn btn-primary">Filtrar</button>
                             </div>
                         </div>
@@ -98,6 +91,18 @@
         </div>
     </div>
 </div>
+
+<style>
+.full-width-input {
+    width: 100% !important;
+    box-sizing: border-box; /* Incluye padding en el ancho total */
+}
+
+/* Asegurar que los inputs de flatpickr también sean 100% */
+.flatpickr-input {
+    width: 100% !important;
+}
+</style>
 
 <div class="container">
     <div class="col-md-12">
@@ -347,17 +352,18 @@
     </div>
 </div>
 
+<!-- Agregar estos en la sección cabecera -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 
-{{ Html::script('modulo-estadisticas/js/moment.min.js') }}
-{{ Html::script('modulo-estadisticas/js/bootstrap-datetimepicker.min.js') }}
-
-<script type="text/javascript">
-    // Asegurarse que el DOM esté completamente cargado
-    $(document).ready(function(){
-        $('#datetimepicker7, #datetimepicker9').datetimepicker({
-            pickTime: false,
-            format: 'YYYY-MM-DD'
-        });
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    flatpickr(".flatpickr", {
+        dateFormat: "Y-m-d",
+        locale: "es",
+        allowInput: false
     });
+});
 </script>
 @stop
