@@ -62,24 +62,27 @@
             <div class="table-responsive">
                 <form action="{{ URL::current() }}">
                     <div class="row">
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6"> 
-                            <div class="form-group">
-                                {{ Form::text('min_price', $min_price ?? now()->subDays(3)->format('Y-m-d'), [
-                                'class' => 'form-control flatpickr full-width-input',
-                                'placeholder' => 'Ingrese fecha desde',
-                                'readonly' => 'readonly'
-                                ]) }}
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6"> 
-                            <div class="form-group">
-                                {{ Form::text('max_price', $max_price ?? now()->format('Y-m-d'), [
-                                'class' => 'form-control flatpickr full-width-input',
-                                'placeholder' => 'Ingrese fecha hasta', 
-                                'readonly' => 'readonly'
-                                ]) }}
-                            </div>
-                        </div>
+                       <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+    <div class="form-group">
+        <input type="text"
+            name="min_price"
+            value="{{ $min_price ?? now()->subDays(3)->format('Y-m-d') }}"
+            class="form-control flatpickr full-width-input"
+            placeholder="Ingrese fecha desde"
+            readonly>
+    </div>
+</div>
+
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+    <div class="form-group">
+        <input type="text"
+            name="max_price"
+            value="{{ $max_price ?? now()->format('Y-m-d') }}"
+            class="form-control flatpickr full-width-input"
+            placeholder="Ingrese fecha hasta"
+            readonly>
+    </div>
+</div>
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> 
                             <div class="form-group text-right">
                                 <button class="btn btn-primary">Filtrar</button>

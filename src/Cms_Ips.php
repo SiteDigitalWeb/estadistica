@@ -1,10 +1,19 @@
 <?php
+
 namespace Sitedigitalweb\Estadistica;
 
 use Illuminate\Database\Eloquent\Model;
-class Cms_Ips extends Model
+use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
+class Cms_ips extends Model
 {
-	protected $table = 'cms_ips';
-	public $timestamps = false;
+    use BelongsToTenant;
+
+    protected $table = 'cms_ips';
+
+    protected $fillable = [
+        'tenant_id',
+        'ip',
+        'name',
+    ];
 }

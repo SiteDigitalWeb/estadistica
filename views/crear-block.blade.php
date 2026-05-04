@@ -61,22 +61,33 @@
                                     </div>
                                     <!-- END Form Elements Title -->
                                    
-                                    {{ Form::open(array('method' => 'POST','class' => 'form-horizontal','id' => 'defaultForm1', 'url' => array('/sd/stadistics-block/creates'))) }}
-                                        
-                                        <div class="form-group">
-                                            <label class="col-md-3 control-label" for="example-text-input">Crear IP</label>
-                                            <div class="col-md-9">
-                                                {{Form::text('ips', '', array('class' => 'form-control','placeholder'=>'Ingrese IP','maxlength' => '50' ))}}
-                                            </div>
-                                        </div>
-                                 
-                                        <div class="form-group form-actions">
-                                            <div class="col-md-9 col-md-offset-3">
-                                                <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-angle-right"></i> Crear</button>
-                                                <button type="reset" class="btn btn-sm btn-warning"><i class="fa fa-repeat"></i> Cancelar</button>
-                                            </div>
-                                        </div>
-                                    {{ Form::close() }}
+                                    <form method="POST" action="{{ url('/sd/stadistics-block/creates') }}" class="form-horizontal" id="defaultForm1">
+    @csrf
+
+    <div class="form-group">
+        <label class="col-md-3 control-label" for="ips">Crear IP</label>
+        <div class="col-md-9">
+            <input type="text"
+                name="ips"
+                id="ips"
+                value=""
+                class="form-control"
+                placeholder="Ingrese IP"
+                maxlength="50">
+        </div>
+    </div>
+
+    <div class="form-group form-actions">
+        <div class="col-md-9 col-md-offset-3">
+            <button type="submit" class="btn btn-sm btn-primary">
+                <i class="fa fa-angle-right"></i> Crear
+            </button>
+            <button type="reset" class="btn btn-sm btn-warning">
+                <i class="fa fa-repeat"></i> Cancelar
+            </button>
+        </div>
+    </div>
+</form>
                                   
                                 </div>
                                 <!-- END Basic Form Elements Block -->

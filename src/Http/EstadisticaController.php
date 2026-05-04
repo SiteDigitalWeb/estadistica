@@ -11,73 +11,62 @@ use Sitedigitalweb\Estadistica\Page;
 use DB;
 use Input;
 use Illuminate\Http\Request;
-use Hyn\Tenancy\Models\Hostname;
-use Hyn\Tenancy\Models\Website;
-use Hyn\Tenancy\Repositories\HostnameRepository;
-use Hyn\Tenancy\Repositories\WebsiteRepository;
 
 
 class EstadisticaController extends Controller{
 
 
-protected $tenantName = null;
+protected ?string $tenantName = null;
+protected bool $isTenant = false;
 
- public function __construct(){
-  $this->middleware('auth');
+public function __construct()
+{
+ 
 
-  $hostname = app(\Hyn\Tenancy\Environment::class)->hostname();
-        if ($hostname){
-            $fqdn = $hostname->fqdn;
-            $this->tenantName = explode(".", $fqdn)[0];
-        }
-
- }
+    // ✅ Stancl Tenancy
+    if (tenancy()->initialized) {
+        $this->isTenant   = true;
+        $this->tenantName = tenant('id');
+    }
+}
 
 public function index(Request $request)
 {
-    // 🔹 Fechas por defecto (últimos 3 días)
     $defaultMinDate = now()->subDays(3)->format('Y-m-d');
     $defaultMaxDate = now()->format('Y-m-d');
-    
-    // 🔹 Obtener parámetros de filtro con valores por defecto
+
     $min_date = $request->input('min_price', $defaultMinDate);
     $max_date = $request->input('max_price', $defaultMaxDate);
 
-    // 🔹 Determinar el contexto (tenant o central)
-    $website = app(\Hyn\Tenancy\Environment::class)->website();
-    
-    if ($website) {
-        // Si está en tenant
-        $statsModel = \Sitedigitalweb\Estadistica\Tenant\Stats::class;
-        $pageModel  = \Sitedigitalweb\Estadistica\Tenant\Page::class;
-    } else {
-        // Si está en el contexto central (no tenant)
-        $statsModel = \Sitedigitalweb\Estadistica\Stats::class;
-        $pageModel  = \Sitedigitalweb\Estadistica\Page::class;
-    }
+    // ✅ Stancl Tenancy
+    $isTenant   = tenancy()->initialized;
+    $statsModel = $isTenant
+        ? \Sitedigitalweb\Estadistica\Tenant\Stats::class
+        : \Sitedigitalweb\Estadistica\Stats::class;
 
-    // 🔹 Consulta base con filtro de fechas
+    $pageModel  = $isTenant
+        ? \Sitedigitalweb\Estadistica\Tenant\Page::class
+        : \Sitedigitalweb\Estadistica\Page::class;
+
     $baseStatsQuery = $statsModel::whereBetween('fecha', [$min_date, $max_date]);
-    
-    // 🔹 Obtener estadísticas generales
+
     $stats = [
-        'visitas'       => $baseStatsQuery->count(),
-        'nuevousuario'  => $baseStatsQuery->distinct('ip')->count('ip'),
-        'conteopagina'  => $pageModel::count(),
-        'paginas'       => $this->getGroupedStats($baseStatsQuery, 'pagina'),
-        'referidos'     => $this->getGroupedStats($baseStatsQuery, 'referido'),
-        'ciudades'      => $this->getGroupedStats($baseStatsQuery, 'ciudad'),
-        'fuentes'       => $this->getGroupedStats($baseStatsQuery->whereNotNull('utm_source'), 'utm_source'),
-        'idiomas'       => $this->getGroupedStats($baseStatsQuery, 'idioma'),
-        // ✅ Ajuste aquí — se quita cp del orden para evitar ONLY_FULL_GROUP_BY
-        'meses'         => $this->getGroupedStats($baseStatsQuery, 'mes'),
-        'paises'        => $this->getGroupedStats($baseStatsQuery, 'pais'),
-        'min_price'     => $min_date,
-        'max_price'     => $max_date,
+        'visitas'      => $baseStatsQuery->count(),
+        'nuevousuario' => $baseStatsQuery->distinct('ip')->count('ip'),
+        'conteopagina' => $pageModel::count(),
+        'paginas'      => $this->getGroupedStats($baseStatsQuery, 'pagina'),
+        'referidos'    => $this->getGroupedStats($baseStatsQuery, 'referido'),
+        'ciudades'     => $this->getGroupedStats($baseStatsQuery, 'ciudad'),
+        'fuentes'      => $this->getGroupedStats($baseStatsQuery->whereNotNull('utm_source'), 'utm_source'),
+        'idiomas'      => $this->getGroupedStats($baseStatsQuery, 'idioma'),
+        'meses'        => $this->getGroupedStats($baseStatsQuery, 'mes'),
+        'paises'       => $this->getGroupedStats($baseStatsQuery, 'pais'),
+        'min_price'    => $min_date,
+        'max_price'    => $max_date,
     ];
 
-    // 🔹 Solo para tenant: agrupar IPs
-    if ($website) {
+    // Solo para tenant: agrupar IPs
+    if ($isTenant) {
         $stats['ips'] = $baseStatsQuery
             ->select('ip', 'utm_source')
             ->selectRaw('COUNT(ip) as sum')
@@ -108,7 +97,7 @@ protected function getGroupedStats($query, $field, $orderBy = 'sum', $orderDir =
 public function blocks()
 {
     $model = $this->tenantName 
-        ? \Sitedigitalweb\Estadistica\Tenant\Cms_Ips::class 
+        ? \Sitedigitalweb\Estadistica\Cms_Ips::class 
         : Cms_Ips::class;
         
     return view('estadistica::block', [
@@ -120,7 +109,7 @@ public function crearblocks()
 {
     // Determinar el modelo según el contexto (tenant o no)
     $pagina = $this->tenantName 
-        ? new \Sitedigitalweb\Estadistica\Tenant\Cms_Ips 
+        ? new \Sitedigitalweb\Estadistica\Cms_Ips 
         : new Cms_Ips;
 
     // Guardar la IP recibida desde el formulario
@@ -135,7 +124,7 @@ public function eliminar($id)
 {
     // Determinar el modelo según el contexto (tenant o no)
     $pagina = $this->tenantName 
-        ? \Sitedigitalweb\Estadistica\Tenant\CmsIps::findOrFail($id) 
+        ? \Sitedigitalweb\Estadistica\Cms_Ips::findOrFail($id) 
         : Cms_Ips::findOrFail($id);
 
     // Eliminar el registro
@@ -147,7 +136,7 @@ public function eliminar($id)
 
 
 
-	
+    
 
 
 
